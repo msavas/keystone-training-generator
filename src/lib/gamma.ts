@@ -22,6 +22,12 @@ async function generateGammaContent(request: GammaApiRequest): Promise<GammaApiR
     throw new Error('Gamma API key not configured');
   }
 
+  console.log('Gamma API request:', {
+    type: request.type,
+    contentLength: request.content?.length || 0,
+    hasApiKey: !!apiKey
+  });
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 second timeout for design generation
 
@@ -48,7 +54,12 @@ async function generateGammaContent(request: GammaApiRequest): Promise<GammaApiR
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gamma API error:', response.status, errorText);
+      console.error('Gamma API error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        body: errorText
+      });
       throw new Error(`Gamma API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
