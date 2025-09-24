@@ -34,7 +34,10 @@ export async function generateTrainingContent(formData: TrainingFormData): Promi
     };
   } catch (error) {
     console.error('Gemini API error:', error);
-    throw new Error('Failed to generate training content');
+    if (error instanceof Error) {
+      throw new Error(`Gemini API failed: ${error.message}`);
+    }
+    throw new Error('Failed to generate training content with Gemini API');
   }
 }
 
@@ -67,7 +70,9 @@ async function callGeminiAPI(prompt: string, apiKey: string) {
     clearTimeout(timeoutId);
     
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Gemini API error response:', errorText);
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
     
     return response.json();

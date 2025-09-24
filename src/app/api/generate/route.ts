@@ -143,20 +143,27 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+      console.log('Step 1: Starting content generation with Gemini API');
       // Step 1: Generate content with Gemini
       const geminiResponse = await generateTrainingContent(formData);
+      console.log('Step 1: Gemini content generation completed successfully');
 
+      console.log('Step 2: Validating content for Gamma API');
       // Step 2: Validate content for Gamma
       const slideValidation = validateGammaContent(geminiResponse.slidesContent);
       if (!slideValidation.valid) {
+        console.error('Slide validation failed:', slideValidation.error);
         throw new Error(`Invalid slide content: ${slideValidation.error}`);
       }
 
       const guideValidation = validateGammaContent(geminiResponse.instructorGuideContent);
       if (!guideValidation.valid) {
+        console.error('Guide validation failed:', guideValidation.error);
         throw new Error(`Invalid guide content: ${guideValidation.error}`);
       }
+      console.log('Step 2: Content validation completed successfully');
 
+      console.log('Step 3: Starting document generation with Gamma API');
       // Step 3: Generate presentation and document with Gamma
       const [slideDeckResponse, instructorGuideResponse] = await Promise.all([
         generatePresentation(formatContentForGamma(geminiResponse.slidesContent, 'presentation')),
@@ -164,8 +171,10 @@ export async function POST(request: NextRequest) {
       ]);
 
       if (!slideDeckResponse.success || !instructorGuideResponse.success) {
+        console.error('Gamma API generation failed:', { slideDeckResponse, instructorGuideResponse });
         throw new Error('Failed to generate documents with Gamma API');
       }
+      console.log('Step 3: Gamma document generation completed successfully');
 
       // Step 4: Update generation with URLs
       const { error: updateError } = await supabaseAdmin
@@ -228,10 +237,23 @@ export async function POST(request: NextRequest) {
         .eq('id', generation.id);
 
       console.error('Generation error:', error);
+      
+      // Provide more detailed error information
+      let errorMessage = 'Generation failed';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        console.error('Detailed error:', {
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause
+        });
+      }
+      
       return NextResponse.json(
         { 
           success: false, 
-          error: error instanceof Error ? error.message : 'Generation failed'
+          error: errorMessage,
+          details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
         },
         { status: 500 }
       );

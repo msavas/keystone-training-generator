@@ -49,7 +49,7 @@ async function generateGammaContent(request: GammaApiRequest): Promise<GammaApiR
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Gamma API error:', response.status, errorText);
-      throw new Error(`Gamma API error: ${response.status} ${response.statusText}`);
+      throw new Error(`Gamma API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const result = await response.json();
