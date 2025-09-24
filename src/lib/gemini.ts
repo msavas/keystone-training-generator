@@ -1,6 +1,6 @@
 import { TrainingFormData, GeminiResponse } from '@/types/training';
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
 interface GeminiRequest {
   contents: {
