@@ -73,13 +73,48 @@ async function generateGammaContent(request: GammaApiRequest): Promise<GammaApiR
       };
     }
 
-    // If the generation is still processing, we might get a different response
+    // If the generation is still processing, poll for completion
     if (result.id || result.generationId) {
-      // In a real implementation, we might need to poll for completion
-      // For now, we'll return the processing response
+      const generationId = result.id || result.generationId;
+      console.log(`Gamma generation started, polling for completion: ${generationId}`);
+      
+      // Poll for completion (max 5 minutes)
+      const maxAttempts = 30; // 30 attempts * 10 seconds = 5 minutes max
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        // Wait 10 seconds between polls
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        
+        try {
+          const statusResponse = await fetch(`${GAMMA_API_URL}/${generationId}`, {
+            headers: {
+              'X-API-KEY': apiKey,
+            }
+          });
+          
+          if (statusResponse.ok) {
+            const statusResult = await statusResponse.json();
+            
+            // Check if generation is complete
+            if (statusResult.url || statusResult.shareUrl || statusResult.link) {
+              console.log(`Gamma generation completed after ${attempt * 10} seconds`);
+              return {
+                success: true,
+                url: statusResult.url || statusResult.shareUrl || statusResult.link
+              };
+            }
+            
+            // If still processing, continue polling
+            console.log(`Gamma generation attempt ${attempt}/${maxAttempts}, still processing...`);
+          }
+        } catch (pollError) {
+          console.error(`Polling attempt ${attempt} failed:`, pollError);
+        }
+      }
+      
+      // If we exhausted all attempts
       return {
         success: false,
-        error: 'Generation in progress - please check status'
+        error: 'Generation timeout - documents may still be processing'
       };
     }
 
