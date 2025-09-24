@@ -43,7 +43,6 @@ async function generateGammaContent(request: GammaApiRequest): Promise<GammaApiR
           language: 'en'
         },
         inputText: request.content,
-        type: request.type,
         // Add theme if provided
         ...(request.theme && { theme: request.theme })
       }),
