@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const formData = validationResult.data;
 
     // Rate limiting check
-    const clientIp = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     const rateLimitKey = `generate:${formData.email}:${clientIp}`;
     const rateLimit = checkRateLimit(rateLimitKey);
     

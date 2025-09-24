@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Rate limiting check for usage endpoint
-    const clientIp = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     const rateLimitKey = `usage:${email}:${clientIp}`;
     const rateLimit = checkRateLimit(rateLimitKey);
     
