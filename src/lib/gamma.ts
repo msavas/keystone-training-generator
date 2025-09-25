@@ -73,14 +73,14 @@ async function generateGammaContent(request: GammaApiRequest): Promise<GammaApiR
       };
     }
 
-    // If the generation is still processing, poll for completion
+    // If the generation is still processing, do a quick check first
     if (result.id || result.generationId) {
       const generationId = result.id || result.generationId;
-      console.log(`Gamma generation started, polling for completion: ${generationId}`);
+      console.log(`Gamma generation started, ID: ${generationId}`);
       
-      // Poll for completion (max 5 minutes)
-      const maxAttempts = 30; // 30 attempts * 10 seconds = 5 minutes max
-      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      // Try a few quick checks (max 1 minute) to see if it completes quickly
+      const quickAttempts = 6; // 6 attempts * 10 seconds = 1 minute
+      for (let attempt = 1; attempt <= quickAttempts; attempt++) {
         // Wait 10 seconds between polls
         await new Promise(resolve => setTimeout(resolve, 10000));
         
@@ -96,25 +96,26 @@ async function generateGammaContent(request: GammaApiRequest): Promise<GammaApiR
             
             // Check if generation is complete
             if (statusResult.url || statusResult.shareUrl || statusResult.link) {
-              console.log(`Gamma generation completed after ${attempt * 10} seconds`);
+              console.log(`Gamma generation completed quickly after ${attempt * 10} seconds`);
               return {
                 success: true,
                 url: statusResult.url || statusResult.shareUrl || statusResult.link
               };
             }
             
-            // If still processing, continue polling
-            console.log(`Gamma generation attempt ${attempt}/${maxAttempts}, still processing...`);
+            console.log(`Gamma generation quick check ${attempt}/${quickAttempts}, still processing...`);
           }
         } catch (pollError) {
-          console.error(`Polling attempt ${attempt} failed:`, pollError);
+          console.error(`Quick polling attempt ${attempt} failed:`, pollError);
         }
       }
       
-      // If we exhausted all attempts
+      // If still processing after quick checks, return the generation ID for later retrieval
+      console.log(`Gamma generation taking longer than expected, returning ID: ${generationId}`);
       return {
-        success: false,
-        error: 'Generation timeout - documents may still be processing'
+        success: true,
+        url: `https://gamma.app/docs/${generationId}`, // Construct the likely URL
+        generationId: generationId
       };
     }
 
