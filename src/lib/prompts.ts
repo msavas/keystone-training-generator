@@ -8,24 +8,24 @@ const PROMPTS_DIR = join(process.cwd(), 'src', 'prompts');
  * Load a markdown prompt file and substitute variables
  */
 export async function loadPrompt(topic: string, formData: TrainingFormData): Promise<string> {
-  const filePath = join(PROMPTS_DIR, `${topic}.md`);
+  const universalFilePath = join(PROMPTS_DIR, 'universal.md');
   
-  // Check if specific prompt file exists
-  if (!existsSync(filePath)) {
-    console.warn(`No specific prompt file found for topic: ${topic}, using default`);
+  // Check if universal prompt file exists
+  if (!existsSync(universalFilePath)) {
+    console.warn('Universal prompt file not found, using default');
     return createDefaultPrompt(formData);
   }
 
   try {
-    // Read the markdown file
-    const promptTemplate = readFileSync(filePath, 'utf-8');
+    // Read the universal markdown file
+    const promptTemplate = readFileSync(universalFilePath, 'utf-8');
     
     // Substitute variables
     const processedPrompt = substituteVariables(promptTemplate, formData);
     
     return processedPrompt;
   } catch (error) {
-    console.error(`Error loading prompt for topic ${topic}:`, error);
+    console.error(`Error loading universal prompt:`, error);
     return createDefaultPrompt(formData);
   }
 }
@@ -71,6 +71,16 @@ function processConditionals(text: string, data: { level: string; industry: stri
   result = processConditionalBlock(result, 'if_level_beginner', data.level === 'beginner');
   result = processConditionalBlock(result, 'if_level_intermediate', data.level === 'intermediate');
   result = processConditionalBlock(result, 'if_level_advanced', data.level === 'advanced');
+  
+  // Topic conditionals
+  result = processConditionalBlock(result, 'if_topic_5s', data.topic === '5s');
+  result = processConditionalBlock(result, 'if_topic_value-stream-mapping', data.topic === 'value-stream-mapping');
+  result = processConditionalBlock(result, 'if_topic_kaizen', data.topic === 'kaizen');
+  result = processConditionalBlock(result, 'if_topic_pull-systems', data.topic === 'pull-systems');
+  result = processConditionalBlock(result, 'if_topic_waste-elimination', data.topic === 'waste-elimination');
+  result = processConditionalBlock(result, 'if_topic_standardized-work', data.topic === 'standardized-work');
+  result = processConditionalBlock(result, 'if_topic_visual-management', data.topic === 'visual-management');
+  result = processConditionalBlock(result, 'if_topic_poka-yoke', data.topic === 'poka-yoke');
   
   return result;
 }

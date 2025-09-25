@@ -22,25 +22,7 @@ Ensure the presentation covers all 8 wastes with {{industry}}-specific examples:
 7. **Defects** - Errors, rework, scrap, corrections
 8. **Skills/Talent** - Underutilizing people's abilities
 
-## INDUSTRY-SPECIFIC APPLICATIONS ({{industry}})
-{{#if_industry_food}}
-**FOOD INDUSTRY WASTE EXAMPLES:**
-- **Transportation**: Moving ingredients unnecessarily between processing stations
-- **Inventory**: Excess perishable inventory leading to spoilage and waste
-- **Motion**: Workers walking excessive distances in production areas
-- **Waiting**: Equipment downtime during changeovers, waiting for quality approvals
-- **Overproduction**: Making more product than customer orders (especially perishables)
-- **Over-processing**: Excessive quality checks, over-packaging
-- **Defects**: Food safety issues, contamination, product recalls
-- **Skills**: Not utilizing workers' improvement ideas, cross-training opportunities
 
-**FOOD INDUSTRY LEAN TOOLS:**
-- HACCP integration with lean principles
-- First In, First Out (FIFO) for inventory management
-- Single Minute Exchange of Die (SMED) for equipment changeovers
-- Total Productive Maintenance (TPM) to reduce equipment downtime
-- Poka-yoke (error-proofing) for food safety
-{{/if_industry_food}}
 
 ## CONTENT STRUCTURE REQUIREMENTS
 
