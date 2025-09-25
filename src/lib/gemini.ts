@@ -1,4 +1,5 @@
 import { TrainingFormData, GeminiResponse } from '@/types/training';
+import { loadPrompt, createInstructorGuidePrompt } from '@/lib/prompts';
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
@@ -16,15 +17,15 @@ export async function generateTrainingContent(formData: TrainingFormData): Promi
     throw new Error('Gemini API key not configured');
   }
 
-  const slidePrompt = createSlidePrompt(formData);
+  const slidePrompt = await loadPrompt(formData.topic, formData);
 
   try {
     // Generate slide content first
     const slidesResponse = await callGeminiAPI(slidePrompt, apiKey);
     const slidesContent = extractContent(slidesResponse);
 
-    // Generate instructor guide based on the slides content
-    const enhancedGuidePrompt = createEnhancedGuidePrompt(formData, slidesContent);
+    // Generate instructor guide based on the slides content  
+    const enhancedGuidePrompt = createInstructorGuidePrompt(formData, slidesContent);
     const guideResponse = await callGeminiAPI(enhancedGuidePrompt, apiKey);
     const instructorGuideContent = extractContent(guideResponse);
 
@@ -119,85 +120,4 @@ function extractContent(response: unknown): string {
   throw new Error('Invalid response format from Gemini API');
 }
 
-function createSlidePrompt(formData: TrainingFormData): string {
-  const { topic, level, duration, industry } = formData;
-  
-  return `Create a comprehensive ${duration}-minute training presentation on ${topic} for ${level} level students in the ${industry} industry.
-
-IMPORTANT FORMATTING REQUIREMENTS:
-- Use "---" to separate each slide
-- Include slide titles as "# Title"
-- Include bullet points and content for each slide
-- Add speaker notes after each slide marked with "SPEAKER NOTES:"
-- Suggest relevant images with "IMAGE SUGGESTION:"
-
-CONTENT REQUIREMENTS:
-- Opening slide with topic introduction
-- Learning objectives (3-5 specific goals)
-- Core concepts broken into digestible sections
-- Real-world examples from ${industry} industry
-- Interactive elements (discussions, activities)
-- Practice exercises or case studies
-- Summary and next steps
-- Q&A slide
-
-AUDIENCE LEVEL: ${level}
-- Beginner: Basic concepts, lots of examples, step-by-step approach
-- Intermediate: Build on existing knowledge, practical applications
-- Advanced: Advanced techniques, leadership aspects, implementation challenges
-
-INDUSTRY CONTEXT: ${industry}
-- Include industry-specific examples
-- Address common challenges in this sector
-- Use relevant terminology and scenarios
-
-DURATION: ${duration} minutes
-- Allocate time appropriately across slides
-- Include timing suggestions in speaker notes
-
-Please generate the complete slide deck content now.`;
-}
-
-
-function createEnhancedGuidePrompt(formData: TrainingFormData, slidesContent: string): string {
-  return `Based on the following slide deck content, create a detailed instructor's guide for this specific presentation:
-
-SLIDE DECK CONTENT:
-${slidesContent}
-
-Create a comprehensive instructor's guide that includes:
-
-1. **Session Overview**
-   - Learning objectives that match the slides
-   - Duration: ${formData.duration} minutes
-   - Target audience: ${formData.level} level in ${formData.industry}
-
-2. **Slide-by-Slide Instructions**
-   - For each slide in the deck above, provide:
-   - Detailed talking points
-   - Timing recommendations
-   - Key messages to emphasize
-   - Potential questions from audience
-
-3. **Interactive Elements**
-   - Discussion questions that relate to slide content
-   - Activities that reinforce key concepts
-   - Industry-specific examples from ${formData.industry}
-
-4. **Preparation and Materials**
-   - What the instructor needs to prepare
-   - Handouts or materials referenced in slides
-   - Room setup recommendations
-
-5. **Assessment and Engagement**
-   - Knowledge check questions
-   - Ways to keep audience engaged
-   - How to handle different learning styles
-
-6. **Troubleshooting**
-   - Common questions about ${formData.topic}
-   - Difficult concepts and how to explain them
-   - Alternative explanations for complex topics
-
-Please create the instructor's guide that specifically supports the slide deck content above.`;
-}
+// Old prompt functions removed - now using markdown-based prompt system
