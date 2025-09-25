@@ -2,6 +2,11 @@
 
 Create a comprehensive {{duration}}-minute **LEAN {{topic}}** training presentation for {{level}} level students in the {{industry}} industry.
 
+**IMPORTANT: You must generate exactly {{total_slides}} slides total.** Use 5 minutes per slide as your guide.
+
+## CONTENT DEPTH GUIDE
+{{depth_instruction}}
+
 ## CORE LEAN METHODOLOGY FOCUS
 This training MUST be grounded in **Lean Manufacturing/Lean Methodology** principles:
 - Focus on **eliminating waste** and **maximizing customer value**
@@ -139,26 +144,26 @@ Ensure the training incorporates these core lean principles:
 
 ## CONTENT STRUCTURE
 
-### Opening (10% of time)
+### Opening ({{opening_slides}} slides - 10% of time)
 - **Hook**: Compelling lean transformation story from {{industry}}
 - **Problem Statement**: Current state challenges and waste impact
 - **Lean Solution Overview**: How {{topic}} addresses these challenges
 - **Learning Objectives**: Specific, measurable outcomes related to {{topic}}
 
-### Core Content (70% of time)
+### Core Content ({{core_slides}} slides - 70% of time)
 - **{{topic}} Definition** within lean methodology context
 - **Lean Tools and Techniques** specific to {{topic}}
 - **{{industry}} Case Studies** and real-world examples
 - **Hands-on Application** exercises and workshops
 - **Implementation Roadmap** with clear, actionable steps
 
-### Interactive Elements
+### Interactive Elements (integrated throughout core content)
 - **Gemba Walk** concepts (going to see the actual place)
 - **Problem-Solving Exercise** using lean thinking and {{topic}} tools
 - **Value Stream Perspective** on {{topic}} application
 - **Waste Identification** exercise related to {{topic}}
 
-### Closing (20% of time)
+### Closing ({{closing_slides}} slides - 20% of time)
 - **Key Takeaways** summarizing lean principles and {{topic}}
 - **Action Planning** for immediate workplace implementation
 - **Continuous Improvement** next steps and ongoing learning
@@ -194,11 +199,16 @@ Ensure the training incorporates these core lean principles:
 {{/if_level_advanced}}
 
 ## FORMATTING REQUIREMENTS
+- **CRITICAL: Create exactly {{total_slides}} slides - no more, no less**
 - Use "---" to separate each slide
 - Include slide titles as "# Title"
 - Include bullet points and detailed content for each slide
 - Add comprehensive speaker notes after each slide marked with "SPEAKER NOTES:"
 - Suggest relevant images with "IMAGE SUGGESTION:"
+- **Distribute slides as follows:**
+  - Opening section: {{opening_slides}} slides
+  - Core content section: {{core_slides}} slides  
+  - Closing section: {{closing_slides}} slides
 
 ## SPEAKER NOTES REQUIREMENTS
 For each slide, include detailed speaker notes with:

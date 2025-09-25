@@ -36,6 +36,23 @@ export async function loadPrompt(topic: string, formData: TrainingFormData): Pro
 function substituteVariables(template: string, formData: TrainingFormData): string {
   const { topic, level, duration, industry } = formData;
   
+  // Calculate slide counts based on 5 minutes per slide, minimum 15 slides
+  const calculatedSlides = Math.round(duration / 5);
+  const totalSlides = Math.max(15, calculatedSlides);
+  const openingSlides = Math.max(1, Math.round(totalSlides * 0.10));
+  const closingSlides = Math.max(1, Math.round(totalSlides * 0.20));
+  const coreSlides = Math.max(1, totalSlides - openingSlides - closingSlides);
+  
+  // Determine content depth based on duration
+  let depthInstruction = '';
+  if (duration < 60) {
+    depthInstruction = 'Focus on a high-level overview. The content should be concise, covering only the most critical points and key takeaways. Prioritize breadth over depth.';
+  } else if (duration <= 120) {
+    depthInstruction = 'Provide a balanced level of detail. Explain core concepts clearly and provide one or two illustrative examples for each key point.';
+  } else {
+    depthInstruction = 'This is a comprehensive training. Deliver in-depth content for each topic. Include detailed explanations, multiple examples, case studies, and practical application steps.';
+  }
+  
   let result = template;
   
   // Basic variable substitution
@@ -43,6 +60,13 @@ function substituteVariables(template: string, formData: TrainingFormData): stri
   result = result.replace(/\{\{level\}\}/g, level);
   result = result.replace(/\{\{industry\}\}/g, industry);
   result = result.replace(/\{\{topic\}\}/g, getTopicLabel(topic));
+  
+  // Slide count substitutions
+  result = result.replace(/\{\{total_slides\}\}/g, totalSlides.toString());
+  result = result.replace(/\{\{opening_slides\}\}/g, openingSlides.toString());
+  result = result.replace(/\{\{core_slides\}\}/g, coreSlides.toString());
+  result = result.replace(/\{\{closing_slides\}\}/g, closingSlides.toString());
+  result = result.replace(/\{\{depth_instruction\}\}/g, depthInstruction);
   
   // Conditional blocks - simple implementation
   result = processConditionals(result, {
