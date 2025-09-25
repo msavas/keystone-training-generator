@@ -64,6 +64,7 @@ export interface GammaApiResponse {
   success: boolean;
   url?: string;
   error?: string;
+  generationId?: string;
 }
 
 export interface GeminiResponse {
